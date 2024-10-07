@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .result-box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload an Image</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <input type="text" name="secret_code" placeholder="Enter secret code">
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if output %}
+    <div class="result-box">
+        {% if output.embedding_successful %}
+            <h2 class="success">Embedding Successful!</h2>
+        {% else %}
+            <h2 class="error">Embedding Failed!</h2>
+        {% endif %}
+        <p><strong>PSNR Value:</strong> {{ output.psnr_value }}</p>
+        <p><strong>Relative Capacity:</strong> {{ output.relative_capacity }}</p>
+        <p><strong>Embedded Image:</strong></p>
+        <img src="{{ output.image_path }}" alt="Embedded Image" style="max-width: 100%; height: auto;">
+    </div>
+    {% endif %}
+</body>
+</html>

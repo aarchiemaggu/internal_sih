@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Results</title>
+</head>
+<body>
+    <h1>Detection Results</h1>
+    <p><strong>Flood Detection Result:</strong> {{ flood_result }}</p>
+    <p><strong>Cyclone Detection Result:</strong> {{ cyclone_result }}</p>
+    <p><strong>Forest Fire Detection Result:</strong> {{ fire_result }}</p>
+    
+    <h2>Uploaded Image</h2>
+    <img src="{{ url_for('static', filename=image_url) }}" alt="Uploaded Image" width="400">
+</body>
+</html>

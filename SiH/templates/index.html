@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Theme Landing Page</title>
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+        /* Additional CSS for Explore Button */
+        #exploreBtn {
+            background-color: black;
+            color: white; /* White text for better contrast */
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #exploreBtn:hover {
+            background-color: #444; /* Darker gray on hover */
+            color: #fb9ef9; /* Light purple text on hover */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            color: #fff;
+            background-color: #3e206d; /* Dark Purple Background */
+            overflow-x: hidden;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            position: fixed; /* Keeps the navbar at the top of the page */
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(50, 50, 50, 0); /* Transparent background */
+            color: white;
+            padding: 10px 20px; /* Padding for the navbar */
+            z-index: 100; /* Ensures the navbar is above other elements */
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between; /* Space out logo and links */
+            align-items: center; /* Center vertically */
+        }
+
+        .logo {
+            font-size: 1.8rem; /* Logo font size */
+        }
+
+        .nav-links {
+            list-style: none; /* Remove bullet points */
+            display: flex; /* Display links in a row */
+        }
+
+        .nav-links li {
+            margin: 0 15px; /* Space between links */
+        }
+
+        .nav-links a {
+            text-decoration: none; /* Remove underline */
+            color: white; /* Link color */
+            font-size: 1.1rem; /* Link font size */
+            transition: color 0.3s; /* Transition for hover effect */
+        }
+
+        .nav-links a:hover {
+            color: #fb9ef9; /* Change color on hover */
+        }
+
+        /* Sidebar (Explore Menu) */
+        .explore-sidebar {
+            height: 100%;
+            width: 0; /* Initial hidden state */
+            position: fixed;
+            z-index: 101; /* Ensure sidebar is above other elements */
+            top: 0;
+            left: 0;
+            background-color: #240a40; /* Dark purple sidebar */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            transition: 0.5s; /* Smooth transition for opening/closing */
+            padding-top: 60px; /* Padding to avoid covering the navbar */
+        }
+
+        .explore-sidebar a {
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            color: #fff;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .explore-sidebar a:hover {
+            background-color: #444;
+        }
+
+        .explore-sidebar .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 36px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #271545;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('stars1.png') repeat; /* Starry background */
+            z-index: 1;
+            animation: moveStars 600s linear infinite;
+            opacity: 0.7;
+        }
+
+        .rotating-planet {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 700px;
+            height: 700px;
+            background: url('planet1.png') no-repeat center center;
+            background-size: contain;
+            animation: rotate 80s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes rotate {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes moveStars {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: 10000px 10000px;
+            }
+        }
+
+        /* Hero content */
+        .content {
+            position: relative;
+            z-index: 3;
+            color: white;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            color: #fff;
+            background-color: transparent;
+            border: 2px solid #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #444;
+            border-color: #444;
+        }
+
+        /* Explore Section */
+        .explore {
+            padding: 50px;
+            text-align: center;
+            background-color: #240a40; /* Darker purple section */
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* To prevent body content from shifting when sidebar is open */
+        body.active {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="container">
+            <div class="logo">
+                <b><a href="#" id="exploreBtn">Explore</a></b>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#login">Login</a></li>
+                <li><a href="#sign">Sign up</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Explore Sidebar -->
+    <div id="exploreMenu" class="explore-sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeExploreMenu()">&times;</a>
+        <a href="/tiff-conversion">TIFF Conversion and Compression</a>
+        <a href="/data-hiding">Reversible Data Hiding</a>
+        <a href="/cal">Anomaly Detection</a>
+        <a href="/dehazing">Dehazing</a>
+        <a href="/adjust-contrast">Contrast Enhancement</a>
+        <a href="/extract-region">Partial Downloads</a>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="stars"></div>
+        <div class="content">
+            <h1>Welcome to the Cosmos</h1>
+            <p>Explore the vastness of space and beyond. Your adventure awaits!</p>
+        </div>
+        <div class="rotating-planet"></div> <!-- Rotating planet div -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Smooth scrolling for links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+
+        // Open the Explore sidebar
+        document.getElementById("exploreBtn").onclick = function() {
+            document.getElementById("exploreMenu").style.width = "250px";
+            document.body.classList.add("active");  // Optional: Prevent content scroll when sidebar is open
+        };
+
+        // Close the Explore sidebar
+        function closeExploreMenu() {
+            document.getElementById("exploreMenu").style.width = "0";
+            document.body.classList.remove("active");  // Restore scroll when sidebar is closed
+        }
+    </script>
+</body>
+</html>

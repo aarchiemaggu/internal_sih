@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Adjust Contrast</title>
+</head>
+<body>
+    <h1>Upload Image and Adjust Contrast</h1>
+    
+    <!-- Form to upload image and adjust contrast -->
+    <form method="POST" enctype="multipart/form-data">
+        <label for="image">Choose an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required><br><br>
+
+        <label for="contrast">Adjust contrast:</label>
+        <input type="range" id="contrast" name="contrast" min="0.5" max="2.0" step="0.1" value="1.0">
+        <span id="contrast_value">1.0</span><br><br>
+
+        <input type="submit" value="Upload and Adjust">
+    </form>
+
+    <hr>
+
+    <!-- Display success message and the adjusted image -->
+    {% if message %}
+        <p><strong>{{ message }}</strong></p>
+        <h3>Adjusted Image:</h3>
+        <img src="/output/{{ output_image }}" alt="Adjusted Image">
+    {% endif %}
+
+    <!-- Display error message if any -->
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <script>
+        // Update the contrast value display when the range input changes
+        const contrastSlider = document.getElementById('contrast');
+        const contrastValueDisplay = document.getElementById('contrast_value');
+        contrastSlider.addEventListener('input', function() {
+            contrastValueDisplay.textContent = contrastSlider.value;
+        });
+    </script>
+</body>
+</html>
