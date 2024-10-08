@@ -12,14 +12,20 @@ import uuid
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageEnhance
 import logging
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template
+from pathlib import Path
 
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # Define upload folders
-UPLOAD_FOLDER = r'c:\Users\user\Desktop\internal\data'
-OUTPUT_FOLDER = r'c:\Users\user\Documents\SiH\output_folder'
+
+
+# Define the folders relative to the script's location
+BASE_DIR = Path(__file__).resolve().parent  # Gets the folder where the script is located
+UPLOAD_FOLDER = BASE_DIR / 'data'
+OUTPUT_FOLDER = BASE_DIR / 'output_folder'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 if not os.path.exists(OUTPUT_FOLDER):
@@ -387,6 +393,15 @@ def upload_image():
 
     return render_template('upload.html')
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['OUTPUT_FOLDER'] = 'dehazed/'
+
+# Ensure upload and output folders exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
+
+# Allowed file check
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -429,8 +444,7 @@ def simplest_cb(img, percent):
 
     return cv2.merge(out_channels)
 
-
-
+# Route to handle the upload and dehazing
 @app.route('/dehazing', methods=['GET', 'POST'])
 def upload_dehazing_image():
     if request.method == 'GET':
@@ -467,33 +481,35 @@ def upload_dehazing_image():
             # Apply the dehazing function
             processed_img = simplest_cb(img, 1)
 
-            # Generate a unique filename and save the processed image
-            unique_filename = f"{uuid.uuid4().hex}_{filename}"
-            processed_path = os.path.join(app.config['OUTPUT_FOLDER'], unique_filename)
+            # Save the dehazed image with the same name as the original in the 'dehazed' folder
+            processed_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
 
             if not cv2.imwrite(processed_path, processed_img):
                 return "Error: Failed to save the processed image."
 
-            # Redirect to a route to display the processed image
-            return redirect(url_for('show_image', filename=unique_filename, success=True))
+            # Redirect to a route to display the processed image along with the original
+            return redirect(url_for('show_images', original=filename, processed=filename))
 
+# Route to display the original and processed images
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route('/output/<filename>')
-def show_image(filename):
-    # Check if the image exists in the output folder
-    processed_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
-    if not os.path.exists(processed_path):
-        return "Error: Image not found."
+@app.route('/dehazed/<filename>')
+def dehazed_file(filename):
+    return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
 
-    # Display the image on the page and give a success message
-    success_message = request.args.get('success', False)
-    
+@app.route('/show_images')
+def show_images():
+    original_filename = request.args.get('original')
+    processed_filename = request.args.get('processed')
     return f'''
-    <h2>Processed Image</h2>
-    <img src="{url_for('static', filename='output/' + filename)}" alt="Processed Image">
-    <p>{'Dehazed image saved successfully' if success_message else ''}</p>
-    <a href="{url_for('upload_dehazing_image')}">Upload another image</a>
+    <h2>Original Image</h2>
+    <img src="{url_for('uploaded_file', filename=original_filename)}" alt="Original Image" width="300">
+    <h2>Dehazed Image</h2>
+    <img src="{url_for('dehazed_file', filename=processed_filename)}" alt="Dehazed Image" width="300">
     '''
+
 
 
 # Route to serve the processed image
@@ -600,6 +616,7 @@ OUTPUT_DIR = 'output'
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
+# Function to adjust contrast
 def adjust_contrast(image, contrast_factor):
     """Adjust the contrast of the image."""
     enhancer = ImageEnhance.Contrast(image)
@@ -610,7 +627,7 @@ def upload_and_adjust_contrast():
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'image' not in request.files:
-            return render_template('index.html', error="No image part in the request")
+            return render_template('index4.html', error="No image part in the request")
 
         file = request.files['image']
         if file.filename == '':
@@ -624,6 +641,7 @@ def upload_and_adjust_contrast():
 
         # Adjust the contrast
         img = adjust_contrast(img, contrast_factor)
+        img = img.resize((350, 350), Image.Resampling.LANCZOS)
 
         # Save the image to the output folder with a modified filename
         output_filename = f"contrasted_{file.filename}"
@@ -635,9 +653,14 @@ def upload_and_adjust_contrast():
 
     return render_template('index4.html')
 
+# Route to serve the images from the output folder
+@app.route('/output/<filename>')
+def send_output_file(filename):
+    return send_from_directory(OUTPUT_DIR, filename)
+
+# Configuration for uploads (optional, in case needed later)
 app.config['UPLOAD_FOLDER'] = 'uploads'  # Set the upload folder
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
